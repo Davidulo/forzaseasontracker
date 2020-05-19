@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<!--    
+Forza Season Tracker/Info
+    Copyright &copy; 2020  David Martinek
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<head>
+<style>
+
+@font-face {
+  font-family: 'Open Sans';
+  src: url('fontt\\OpenSans-BoldItalic.ttf');
+   }
+
+#page {
+    display: none;
+}
+#loading {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(192, 192, 192, 0.5);
+    background-image: url("https://gifimage.net/wp-content/uploads/2017/09/ajax-loading-gif-transparent-background-4.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+	
+}
+body {
+
+  font-family: 'Open Sans', sans-serif;
+  font-size: 20px;
+  text-align: center;
+   /*background: linear-gradient(90deg, #161122 21px, transparent 1%) center, linear-gradient(#161122 21px, transparent 1%) center, #a799cc;
+	 background-size: 22px 22px;*/
+background-color: #333533;
+}
+  
+
+
+/*
+css design stranky
+*/
+    }
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    #size {
+      width: 100px;
+      height: 100px;
+      background: red;
+      top:150px;
+        z-index: 5;
+         position:absolute;
+    }
+  
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+#size {
+     width: 100px;
+     height: 100px;
+     position:absolute;
+     background: red;
+     top:150px;
+     z-index: 5;
+  }
+
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+#maintitle{
+  
+  border: 1px solid pink;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  top:60px;
+  color: black;
+  font-size: 50px;
+
+}
+    #size {
+     width: 100px;
+     height: 100px;
+     position:absolute;
+     background: blue;
+     top:150px;
+     z-index: 5;
+   }
+     #rectangle{
+    position:absolute;
+    top:0px;
+    left:0px;
+    height:150px;
+    width:100%;
+    background-color:#E1B753;
+    
+     }
+     #pagecontent{
+ border: 1px solid pink;
+ position:relative;
+ top:200px;
+  color: white;
+  font-size: 25px;
+
+     }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+     #size {
+      width: 100px;
+      height: 100px;
+    background: orange;
+     position:absolute;
+    top:150px;
+      z-index: 5;
+  }
+ #rectangle {
+      width: 100%;
+      height: 150px;
+      background-color: black; 
+} 
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+    #size {
+        position:absolute;
+      width: 100px;
+      height: 100px;
+    background: pink;
+    top:150px;
+      z-index: 5;
+  }
+ #rectangle {
+      width: 100%;
+      height: 150px;
+      background-color: black;
+}
+</style>
+<div id="size"></div>   
+<div id="page">
+<div id="rectangle">
+<h1 id="maintitle">Forza Horizon 4 season tracker</h1>
+</div>
+<div id="pagecontent">
+<h1 id="forzaseasontext">Current</h1>
+<h2 id="forzaseasontextnext">Next</h2>
+<h3 id="casik">Loading...</h3>
+</div>
+<!--
+<p id="h1"></p>
+-->
+</div>
+<div id="loading"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment-with-locales.min.js" integrity="sha256-ZykW30UBCXWkPGsVyVPdJlUrce9/PawgYCEzinA4pnU=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.17/moment-timezone-with-data-2012-2022.min.js" integrity="sha256-pQNlWZakdoYCCoBWZ5G8hXPqONH7l7QX+MGFoAkiBqs=" crossorigin="anonymous"></script>
+<script
+  src="https://code.jquery.com/jquery-3.5.0.min.js"
+  integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ="
+  crossorigin="anonymous"></script>
+
+<script>
+    var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/x-icon';
+    link.rel = 'shortcut icon';
+    link.href = 'ForzaHorizon4-lg.png';
+    document.getElementsByTagName('head')[0].appendChild(link);
+	
+var duration;
+var forzanextseason;
+document.title = "Forza Horizon 4 season tracker";
+var datecheckint = 5;
+var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+var timezone1 = "America/Los_Angeles"
+//console.log(timezone);
+//let nextseasonF = moment("2019-6-30 16:30:00");
+
+$(document).ready(function() {
+clearInterval(refreshIntervalFT);
+    $(window).blur(function() {
+	refreshIntervalFT = setInterval(forzatitle, 1000);
+	forzatitle();
+	console.log("Blurred");
+	      
+      });
+	$(window).focus(function() {
+      clearInterval(refreshIntervalFT);
+	  document.title = "Forza Horizon 4 season tracker";
+	  console.log("Focused");
+      });
+});
+function forzatitle()
+{
+document.title = forzanextseason + " in " + duration.days() + "d " + duration.hours() + "h " + duration.minutes() + "m " + duration.seconds() + "s";
+//document.title = forzanextseason + " in " + duration.days() + ":" + duration.hours() + ":" + duration.minutes() + ":" + duration.seconds();
+//refreshIntervalFT = setInterval(forzatitle, 1000);
+}
+
+refreshIntervalFT;
+
+var refreshIntervalFT = setInterval(forzatitle, 1000);
+var lastSpo = moment('2020-04-30 16:30:00', "YYYY-MM-DD hh:mm:ss");
+let nextseason = moment().tz(timezone).day('thursday').hours('16').minutes('30').seconds('0').format();
+//console.log(nextseasonF);
+//summer - 1
+//autumn - 2
+//winter - 3
+//spring - 4
+function forzaSummer() 
+{
+
+
+}
+function forzaAutumn() 
+{
+   
+}
+function forzaWinter() 
+{
+    
+}
+function forzaSpring() 
+{
+    
+
+}
+var forzaSezona = function()  {
+var lastSp = moment().format('YYYY-MM-DD HH:mm:ss');
+//console.log("seasson function start");
+//console.log(lastSp);
+//console.log(lastSpo);
+var pocetdniMin = moment.duration(lastSpo.diff(lastSp)).asDays();
+var Pocetdni = ((-1)* pocetdniMin).toFixed(2)	
+var forzaseason = 4;
+var seasonname;
+
+  var text = ""
+  //var Pocetdni = 14;
+  while (Pocetdni > 112) {
+    Pocetdni = Pocetdni - 112;
+    forzaseason = forzaseason + 4;
+  }
+  
+  while (Pocetdni > 28) {
+    Pocetdni = Pocetdni - 28;
+    forzaseason = forzaseason + 4;
+  }
+// */ 
+  while (Pocetdni >= 7) {
+    Pocetdni = Pocetdni - 7;
+    forzaseason = forzaseason + 1;
+  }
+  
+  while (forzaseason > 4) {
+    forzaseasontext += "<br>Forzaseason:  " + forzaseason;
+    forzaseason = forzaseason - 4;
+  }
+  if (forzaseason == 1) 
+  {
+  seasonname = "Summer";
+  forzanextseason = "Autumn";
+  forzaSummer();
+  }
+    if (forzaseason == 2) 
+  {
+  seasonname = "Autumn";
+  forzanextseason = "Winter";
+  forzaAutumn();  
+  }
+    if (forzaseason == 3) 
+  {
+  seasonname = "Winter";
+  forzanextseason = "Spring";
+  forzaWinter();  
+  }
+    if (forzaseason == 4) 
+  {
+  seasonname = "Spring";
+  forzanextseason = "Summer";
+  forzaSpring();  
+  }
+  document.getElementById("forzaseasontext").innerHTML = "Current season is " + seasonname;
+  document.getElementById("forzaseasontextnext").innerHTML = "Next season will be  " + forzanextseason;
+  //document.getElementById("h1").innerHTML = Pocetdni;
+  
+//console.log("seasson function end");
+}	
+setTimeout(forzaSezona, datecheckint);
+datecheckint = 5;
+var interval = 5;
+var checkdate = function() {
+var isafter = moment().tz(timezone).isAfter(nextseason);
+  //console.log("Datum teď: " + nextseason);
+
+  if (isafter) {
+    //console.log("yeeeeeto");
+    nextseason = moment(nextseason).add(7 , 'days').format();
+	
+    //console.log("Další datum je: " + nextseason);
+  } else {
+    //console.log("neeee :(");
+    (function() {
+
+  var timeElement, currentTime, interval, intervalId;
+
+  timeElement = document.querySelector("#casik");
+
+  currentTime = moment().tz(timezone);
+  duration = moment.duration(moment(nextseason).diff(currentTime));
+  var writetime = function() {
+	interval = 1000; // 1 second
+    duration = moment.duration(duration - interval, 'milliseconds');
+    if (duration.asSeconds() <= 0) {
+      clearInterval(intervalId);
+      timeElement.classList.add("hidden");
+    } else {
+      timeElement.innerText = "Next season in " + duration.days() + " days " + duration.hours() + " hours " + duration.minutes() + " minutes " + duration.seconds() + " seconds";
+	  	  }
+  }
+  setTimeout(writetime, datecheckint);
+
+}());
+//console.log("done");
+//console.log(datecheckint);
+  }
+  setTimeout(checkdate, datecheckint);
+  loadingscreen();
+  datecheckint = 1000;
+  }
+setTimeout(checkdate, datecheckint);
+function loadingscreen() {
+setTimeout(function(){
+$("#page").fadeIn(300);
+$("#loading").fadeOut(300);
+}, 10);
+};
+
+</script>
+
+</head>
+
+<body>
+
+
+</body>
+<footer>
+<a href="copyright.html">Copyright (C) 2020  David Martínek</a>
+</footer>
+</html>
